@@ -33,6 +33,6 @@ for a in sp_root.cssselect('table a'):
   
   am_html = scraperwiki.scrape(am_link)
   am_root = lxml.html.fromstring(am_html)
-  name = am_root.cssselect('h1').text_content()
+  name = am_root.cssselect('h1')[0].text_content()
   print name
   
