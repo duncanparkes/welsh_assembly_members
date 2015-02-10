@@ -36,7 +36,7 @@ for a in sp_root.cssselect('table a'):
   am_html = scraperwiki.scrape(am_link)
   am_root = lxml.html.fromstring(am_html)
   name = am_root.cssselect('h1')[0].text_content().strip()
-  # print name
+  print 'Processing {}'.format(name)
   
   # We don't need the 'AM' suffix - they all have that.
   if name.endswith(' AM'):
@@ -54,8 +54,8 @@ for a in sp_root.cssselect('table a'):
       am['en_party_name'] = span_tail
     elif span_text == 'Constituency:':
       am['en_constituency_name'] = span_tail
-  
-  # print am
+    elif span_text == 'Region:':
+      am['en_region_name'] = span_tail
   
   scraperwiki.sqlite.save(unique_keys=['name'], data=am)
   
