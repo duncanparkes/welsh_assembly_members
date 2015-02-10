@@ -51,7 +51,7 @@ for a in sp_root.cssselect('table a'):
     if span_text == 'Title:':
       am['title'] = span_tail
     elif span_text == 'Party:':
-      am['party_name' = span_tail
+      am['party_name'] = span_tail
     elif span_text == 'Constituency:':
       am['constituency_name'] = span_tail
   
