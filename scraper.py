@@ -23,6 +23,6 @@ import lxml.html
 # has at least a table called data.
 
 seating_plan_html = scraperwiki.scrape('http://www.assembly.wales/en/memhome/Pages/mem-seating-plan.aspx')
-sp_root = lxml.html.fromstring(html)
+sp_root = lxml.html.fromstring(seating_plan_html)
 for a in sp_root.cssselect('table a'):
   print a.href
