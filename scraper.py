@@ -28,11 +28,32 @@ links = sp_root.cssselect('table a')
 print '{} links found'.format(len(links))
 
 for a in sp_root.cssselect('table a'):
+  am = {}
   am_link = a.get('href')
-  print am_link
+  # print am_link
+  am['href'] = am_link
   
   am_html = scraperwiki.scrape(am_link)
   am_root = lxml.html.fromstring(am_html)
-  name = am_root.cssselect('h1')[0].text_content()
-  print name
+  name = am_root.cssselect('h1')[0].text_content().strip()
+  # print name
+  
+  # We don't need the 'AM' suffix - they all have that.
+  if name.endswith(' AM'):
+    name = name[:-3]
+    
+  am['name'] = name
+
+  sidebar_spans = am_root.cssselect('div.mgUserSideBar p span.mgLabel')
+  for span in sidebar_spans:
+    span_text = span.text.strip()
+    span_tail = span.tail.strip()
+    if span_text == 'Title:':
+      am['title'] = span_tail
+    elif span_text == 'Party:':
+      am['party_name' = span_tail
+    elif span_text == 'Constituency:':
+      am['constituency_name'] = span_tail
+  
+  print am
   
