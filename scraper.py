@@ -9,6 +9,8 @@ sp_root = lxml.html.fromstring(seating_plan_html)
 links = sp_root.cssselect('table a')
 print '{} links found'.format(len(links))
 
+names = set()
+
 for a in sp_root.cssselect('table a'):
   am = {}
   am_link = a.get('href')
@@ -19,6 +21,10 @@ for a in sp_root.cssselect('table a'):
   am_root = lxml.html.fromstring(am_html)
   name = am_root.cssselect('h1')[0].text_content().strip()
   print 'Processing {}'.format(name)
+  
+  if name in names:
+    print "WARNING: duplicate name {}"
+  names.add(name)
   
   # We don't need the 'AM' suffix - they all have that.
   if name.endswith(' AM'):
