@@ -22,16 +22,16 @@ for a in sp_root.cssselect('table a'):
   name = am_root.cssselect('h1')[0].text_content().strip()
   print 'Processing {}'.format(name)
   
-  if name in names:
-    print "WARNING: duplicate name {}"
-  names.add(name)
-  
   # We don't need the 'AM' suffix - they all have that.
   if name.endswith(' AM'):
     name = name[:-3]
     
   am['name'] = name
-
+  
+  if name in names:
+    print "WARNING: duplicate name {}"
+  names.add(name)
+  
   sidebar_spans = am_root.cssselect('div.mgUserSideBar p span.mgLabel')
   for span in sidebar_spans:
     span_text = span.text.strip()
