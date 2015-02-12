@@ -39,11 +39,13 @@ for a in sp_root.cssselect('table a'):
     if span_text == 'Title:':
       am['en_title'] = span_tail
     elif span_text == 'Party:':
-      am['en_party_name'] = span_tail
+      am['group'] = am['en_party_name'] = span_tail
     elif span_text == 'Constituency:':
       am['en_constituency_name'] = span_tail
     elif span_text == 'Region:':
       am['en_region_name'] = span_tail
+  
+  am['area'] = am.get('en_constituency_name') or am.get('en_region_name')
   
   scraperwiki.sqlite.save(unique_keys=['name'], data=am)
   
