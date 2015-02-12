@@ -2,6 +2,7 @@
 
 import scraperwiki
 import lxml.html
+import re
 
 
 seating_plan_html = scraperwiki.scrape('http://www.assembly.wales/en/memhome/Pages/mem-seating-plan.aspx')
@@ -9,6 +10,7 @@ sp_root = lxml.html.fromstring(seating_plan_html)
 links = sp_root.cssselect('table a')
 print '{} links found'.format(len(links))
 
+name_re = re.compile(r'([\w\s]*\w)\s*(?:\(([\w\s]*)\))?')
 names = set()
 
 for a in sp_root.cssselect('table a'):
@@ -26,7 +28,9 @@ for a in sp_root.cssselect('table a'):
   if name.endswith(' AM'):
     name = name[:-3]
     
+  name, other_name = names_re.match(name).groups()
   am['name'] = name
+  am['other_name'] = other_name
   
   if name in names:
     print "WARNING: duplicate name {}"
