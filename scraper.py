@@ -28,7 +28,7 @@ for a in sp_root.cssselect('table a'):
   if name.endswith(' AM'):
     name = name[:-3]
     
-  name, other_name = names_re.match(name).groups()
+  name, other_name = name_re.match(name).groups()
   am['name'] = name
   am['other_name'] = other_name
   
