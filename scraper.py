@@ -34,16 +34,30 @@ for a in sp_root.cssselect('table a'):
 
   sidebar_spans = am_root.cssselect('div.mgUserSideBar p span.mgLabel')
   for span in sidebar_spans:
-    span_text = span.text.strip()
+    span_text = span.text.strip().rstrip(' :')
     span_tail = span.tail.strip()
-    if span_text == 'Title:':
+    if span_text == 'Title':
       am['en_title'] = span_tail
-    elif span_text == 'Party:':
+    elif span_text == 'Party':
       am['en_party_name'] = span_tail
-    elif span_text == 'Constituency:':
+    elif span_text == 'Constituency':
       am['en_constituency_name'] = span_tail
-    elif span_text == 'Region:':
+    elif span_text == 'Region':
       am['en_region_name'] = span_tail
+  
+  body_spans = am_root.cssselect('div.mgUserBody p span.mgLabel')
+  for span in body_spans:
+    span_text = span.text.strip().rstrip(' :')
+    span_tail = span.tail.strip()
+    if span_text == 'Email':
+      am['email'] = span_tail
+    elif span_text == 'Facebook':
+      am['facebook'] = span_tail
+    elif span_text == 'Twitter':
+      am['twitter'] = span_tail
+    elif span_text == 'Blog':
+      am['blog'] = span_tail
+    
   
   scraperwiki.sqlite.save(unique_keys=['name'], data=am)
   
