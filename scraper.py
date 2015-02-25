@@ -17,8 +17,9 @@ for a in sp_root.cssselect('table a'):
   am = {}
   am_link = a.get('href')
   # print am_link
-  am['id'] = am['href'] = am_link
-  
+  am['href'] = am_link
+  am['id'] = am_link.rsplit('=', 1)[-1]
+
   am_html = scraperwiki.scrape(am_link)
   am_root = lxml.html.fromstring(am_html)
   name = am_root.cssselect('h1')[0].text_content().strip()
