@@ -24,19 +24,19 @@ for a in sp_root.cssselect('table a'):
   am_root = lxml.html.fromstring(am_html)
   name = am_root.cssselect('h1')[0].text_content().strip()
   print 'Processing {}'.format(name)
-  
+
   # We don't need the 'AM' suffix - they all have that.
   if name.endswith(' AM'):
     name = name[:-3]
-    
+
   name, other_name = name_re.match(name).groups()
   am['name'] = name
   am['other_name'] = other_name
-  
+
   if name in names:
     print "WARNING: duplicate name {}"
   names.add(name)
-  
+
   sidebar_spans = am_root.cssselect('div.mgUserSideBar p span.mgLabel')
   for span in sidebar_spans:
     span_text = span.text.strip()
@@ -49,13 +49,13 @@ for a in sp_root.cssselect('table a'):
       am['en_constituency_name'] = span_tail
     elif span_text == 'Region:':
       am['en_region_name'] = span_tail
-  
+
   am['area'] = am.get('en_constituency_name') or am.get('en_region_name')
   if 'en_title' in am:
     am['post'] = 'Commissioner-{}'.format(group) if title == 'Commissioner' else title
-    
+
   scraperwiki.sqlite.save(unique_keys=['name'], data=am)
-  
+
 
 # # An arbitrary query against the database
 # scraperwiki.sql.select("* from data where 'name'='peter'")
