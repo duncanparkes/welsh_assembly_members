@@ -3,9 +3,11 @@
 import scraperwiki
 import lxml.html
 import re
+import urlparse
 
 
-seating_plan_html = scraperwiki.scrape('http://www.assembly.wales/en/memhome/Pages/mem-seating-plan.aspx')
+seating_plan_url = 'http://www.assembly.wales/en/memhome/Pages/mem-seating-plan.aspx'
+seating_plan_html = scraperwiki.scrape(seating_plan_url)
 sp_root = lxml.html.fromstring(seating_plan_html)
 links = sp_root.cssselect('table a')
 print '{} links found'.format(len(links))
@@ -53,6 +55,11 @@ for a in sp_root.cssselect('table a'):
   am['area'] = am.get('en_constituency_name') or am.get('en_region_name')
   if 'en_title' in am:
     am['post'] = 'Commissioner-{}'.format(group) if title == 'Commissioner' else title
+
+  am['image'] = urlparse.urljoin(
+    am_link,
+    am_root.cssselect('div.mgBigPhoto img')[0].attrib.get('src'),
+    )
 
   scraperwiki.sqlite.save(unique_keys=['name'], data=am)
 
