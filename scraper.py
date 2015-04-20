@@ -69,7 +69,7 @@ for a in sp_root.cssselect('table a'):
     if 'Twitter' in span_text:
       am['twitter'] = span.getparent().find('a').get('href')
     elif 'Email' in span_text:
-      am['email'] = span.getparent().find('a').get('href')
+      am['email'] = span.getparent().find('a').get('href').replace('mailto:', '')
 
 
   scraperwiki.sqlite.save(unique_keys=['name'], data=am)
