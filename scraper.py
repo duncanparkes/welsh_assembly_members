@@ -61,6 +61,15 @@ for a in sp_root.cssselect('table a'):
     am_root.cssselect('div.mgBigPhoto img')[0].attrib.get('src'),
     )
 
+  msg_body_spans = am_root.cssselect('div.mgUserBody p span.mgLabel')
+  for span in msg_body_spans:
+    span_text = span.text.strip()
+    span_tail = span.tail.strip()
+
+    if 'Twitter' in span_text:
+      am['twitter'] = span.getparent().find('a').get('href')
+
+
   scraperwiki.sqlite.save(unique_keys=['name'], data=am)
 
 
