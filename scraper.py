@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # This is a morph.io scraper
 
 import scraperwiki
@@ -12,7 +14,7 @@ sp_root = lxml.html.fromstring(seating_plan_html)
 links = sp_root.cssselect('table a')
 print '{} links found'.format(len(links))
 
-name_re = re.compile(r'([\w\s]*\w)\s*(?:\(([\w\s]*)\))?')
+name_re = re.compile(r'([\w\s-]*\w)\s*(?:\(([\w\s]*)\))?')
 names = set()
 
 for a in sp_root.cssselect('table a'):
