@@ -22,69 +22,72 @@ def scrape_url(url):
 name_re = re.compile(r'([\w\s-]*\w)\s*(?:\(([\w\s]*)\))?')
 names = set()
 
+
 def scrape_person(url, region_name):
-  am = {}
-  am['href'] = url
-  am['id'] = url.rsplit('=', 1)[-1]
+    am = {}
+    am['href'] = url
+    am['id'] = url.rsplit('=', 1)[-1]
 
-  am_html = scraperwiki.scrape(url)
-  am_root = lxml.html.fromstring(am_html)
-  name = am_root.cssselect('h1')[0].text_content().strip()
-  print 'Processing {}'.format(name)
+    am_html = scraperwiki.scrape(url)
+    am_root = lxml.html.fromstring(am_html)
+    name = am_root.cssselect('h1')[0].text_content().strip()
+    print 'Processing {}'.format(name)
 
-  # We don't need the 'AM' suffix - they all have that.
-  if name.endswith(' AM'):
-    name = name[:-3]
+    # We don't need the 'AM' suffix - they all have that.
+    if name.endswith(' AM'):
+        name = name[:-3]
 
-  name, other_name = name_re.match(name).groups()
-  am['name'] = name
-  am['other_name'] = other_name
+    name, other_name = name_re.match(name).groups()
+    am['name'] = name
+    am['other_name'] = other_name
 
-  if name in names:
-    print "WARNING: duplicate name {}"
-  names.add(name)
+    if name in names:
+        print "WARNING: duplicate name {}"
+    names.add(name)
 
-  sidebar_spans = am_root.cssselect('div.mgUserSideBar p span.mgLabel')
-  for span in sidebar_spans:
-    span_text = span.text.strip()
+    sidebar_spans = am_root.cssselect('div.mgUserSideBar p span.mgLabel')
+    for span in sidebar_spans:
+        span_text = span.text.strip()
     span_tail = span.tail.strip()
     if span_text == 'Title:':
-      title = am['en_title'] = span_tail
+        title = am['en_title'] = span_tail
     elif span_text == 'Party:':
-      group = am['group'] = am['en_party_name'] = span_tail
+        group = am['group'] = am['en_party_name'] = span_tail
     elif span_text == 'Constituency:':
-      am['en_constituency_name'] = span_tail
+        am['en_constituency_name'] = span_tail
     elif span_text == 'Region:':
-      am['en_region_name'] = span_tail
+        am['en_region_name'] = span_tail
 
-  am['area'] = am.get('en_constituency_name') or am.get('en_region_name')
+    am['area'] = am.get('en_constituency_name') or am.get('en_region_name')
 
-  area_id = 'ocd-division/country:gb-wls/region:%s' % region_name
-  constituency = am.get('en_constituency_name')
-  if constituency:
-      area_id = area_id + '/constituency:%s' % constituency
-  am['area_id'] = area_id.replace(' ', '_').lower()
+    area_id = 'ocd-division/country:gb-wls/region:%s' % region_name
+    constituency = am.get('en_constituency_name')
+    if constituency:
+        area_id = area_id + '/constituency:%s' % constituency
+    am['area_id'] = area_id.replace(' ', '_').lower()
 
-  if 'en_title' in am:
-    am['post'] = 'Commissioner-{}'.format(group) if title == 'Commissioner' else title
+    if 'en_title' in am:
+        if title == 'Commissioner':
+            am['post'] = 'Commissioner-{}'.format(group)
+        else:
+            am['post'] = title
 
-  am['image'] = urlparse.urljoin(
-    url,
-    am_root.cssselect('div.mgBigPhoto img')[0].attrib.get('src'),
-    )
+    am['image'] = urlparse.urljoin(
+        url,
+        am_root.cssselect('div.mgBigPhoto img')[0].attrib.get('src'),
+        )
 
-  msg_body_spans = am_root.cssselect('div.mgUserBody p span.mgLabel')
-  for span in msg_body_spans:
-    span_text = span.text.strip()
+    msg_body_spans = am_root.cssselect('div.mgUserBody p span.mgLabel')
+    for span in msg_body_spans:
+        span_text = span.text.strip()
     span_tail = span.tail.strip()
 
     if 'Twitter' in span_text:
-      am['twitter'] = span.getparent().find('a').get('href')
+        am['twitter'] = span.getparent().find('a').get('href')
     elif 'Email' in span_text:
-      am['email'] = span.getparent().find('a').get('href').replace('mailto:', '')
+        am['email'] = span.getparent().find('a').get('href').replace('mailto:', '')
 
-
-  scraperwiki.sqlite.save(unique_keys=['name'], data=am)
+    scraperwiki.sqlite.save(unique_keys=['name'], data=am)
 
 
 for n in range(1, 6):
