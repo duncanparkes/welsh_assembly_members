@@ -8,16 +8,10 @@ import re
 import urlparse
 
 
-seating_plan_url = 'http://www.assembly.wales/en/memhome/Pages/mem-seating-plan.aspx'
-seating_plan_html = scraperwiki.scrape(seating_plan_url)
-sp_root = lxml.html.fromstring(seating_plan_html)
-links = sp_root.cssselect('table a')
-print '{} links found'.format(len(links))
-
 name_re = re.compile(r'([\w\s-]*\w)\s*(?:\(([\w\s]*)\))?')
 names = set()
 
-for a in sp_root.cssselect('table a'):
+def scrape_person(a, region_name):
   am = {}
   am_link = a.get('href')
   # print am_link
@@ -55,6 +49,13 @@ for a in sp_root.cssselect('table a'):
       am['en_region_name'] = span_tail
 
   am['area'] = am.get('en_constituency_name') or am.get('en_region_name')
+
+  area_id = 'ocd-division/country:gb-wls/region:%s' % region_name
+  constituency = am.get('en_constituency_name')
+  if constituency:
+      area_id = area_id + '/constituency:%s' % constituency
+  am['area_id'] = area_id.replace(' ', '_').lower()
+
   if 'en_title' in am:
     am['post'] = 'Commissioner-{}'.format(group) if title == 'Commissioner' else title
 
@@ -76,6 +77,18 @@ for a in sp_root.cssselect('table a'):
 
   scraperwiki.sqlite.save(unique_keys=['name'], data=am)
 
+
+for n in range(1, 6):
+    url_template = 'http://www.assembly.wales/en/memhome/Pages/membersearchresults.aspx?region={}'
+    url = url_template.format(n)
+    html = scraperwiki.scrape(url)
+    sp_root = lxml.html.fromstring(html)
+    title = sp_root.cssselect('#ctl00_PlaceHolderMain_pageTitle')
+    region_name = title[0].text.split(':')[-1].strip()
+    links = sp_root.cssselect('.memberContainer h2 a')
+    print '{} members found for {}'.format(len(links), region_name)
+    for a in links:
+        scrape_person(a, region_name)
 
 # # An arbitrary query against the database
 # scraperwiki.sql.select("* from data where 'name'='peter'")
