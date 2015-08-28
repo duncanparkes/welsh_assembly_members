@@ -8,17 +8,26 @@ import re
 import urlparse
 
 
+def scrape_url(url):
+    html = scraperwiki.scrape(url)
+    sp_root = lxml.html.fromstring(html)
+    title = sp_root.cssselect('#ctl00_PlaceHolderMain_pageTitle')
+    region_name = title[0].text.split(':')[-1].strip()
+    links = sp_root.cssselect('.memberContainer h2 a')
+    print '{} members found for {}'.format(len(links), region_name)
+    for a in links:
+        scrape_person(a.get('href'), region_name)
+
+
 name_re = re.compile(r'([\w\s-]*\w)\s*(?:\(([\w\s]*)\))?')
 names = set()
 
-def scrape_person(a, region_name):
+def scrape_person(url, region_name):
   am = {}
-  am_link = a.get('href')
-  # print am_link
-  am['href'] = am_link
-  am['id'] = am_link.rsplit('=', 1)[-1]
+  am['href'] = url
+  am['id'] = url.rsplit('=', 1)[-1]
 
-  am_html = scraperwiki.scrape(am_link)
+  am_html = scraperwiki.scrape(url)
   am_root = lxml.html.fromstring(am_html)
   name = am_root.cssselect('h1')[0].text_content().strip()
   print 'Processing {}'.format(name)
@@ -60,7 +69,7 @@ def scrape_person(a, region_name):
     am['post'] = 'Commissioner-{}'.format(group) if title == 'Commissioner' else title
 
   am['image'] = urlparse.urljoin(
-    am_link,
+    url,
     am_root.cssselect('div.mgBigPhoto img')[0].attrib.get('src'),
     )
 
@@ -81,14 +90,7 @@ def scrape_person(a, region_name):
 for n in range(1, 6):
     url_template = 'http://www.assembly.wales/en/memhome/Pages/membersearchresults.aspx?region={}'
     url = url_template.format(n)
-    html = scraperwiki.scrape(url)
-    sp_root = lxml.html.fromstring(html)
-    title = sp_root.cssselect('#ctl00_PlaceHolderMain_pageTitle')
-    region_name = title[0].text.split(':')[-1].strip()
-    links = sp_root.cssselect('.memberContainer h2 a')
-    print '{} members found for {}'.format(len(links), region_name)
-    for a in links:
-        scrape_person(a, region_name)
+    scrape_url(url)
 
 # # An arbitrary query against the database
 # scraperwiki.sql.select("* from data where 'name'='peter'")
