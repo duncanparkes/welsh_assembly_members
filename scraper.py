@@ -48,15 +48,15 @@ def scrape_person(url, region_name):
     sidebar_spans = am_root.cssselect('div.mgUserSideBar p span.mgLabel')
     for span in sidebar_spans:
         span_text = span.text.strip()
-    span_tail = span.tail.strip()
-    if span_text == 'Title:':
-        title = am['en_title'] = span_tail
-    elif span_text == 'Party:':
-        group = am['group'] = am['en_party_name'] = span_tail
-    elif span_text == 'Constituency:':
-        am['en_constituency_name'] = span_tail
-    elif span_text == 'Region:':
-        am['en_region_name'] = span_tail
+        span_tail = span.tail.strip()
+        if span_text == 'Title:':
+            title = am['en_title'] = span_tail
+        elif span_text == 'Party:':
+            group = am['group'] = am['en_party_name'] = span_tail
+        elif span_text == 'Constituency:':
+            am['en_constituency_name'] = span_tail
+        elif span_text == 'Region:':
+            am['en_region_name'] = span_tail
 
     am['area'] = am.get('en_constituency_name') or am.get('en_region_name')
 
@@ -80,12 +80,12 @@ def scrape_person(url, region_name):
     msg_body_spans = am_root.cssselect('div.mgUserBody p span.mgLabel')
     for span in msg_body_spans:
         span_text = span.text.strip()
-    span_tail = span.tail.strip()
+        span_tail = span.tail.strip()
 
-    if 'Twitter' in span_text:
-        am['twitter'] = span.getparent().find('a').get('href')
-    elif 'Email' in span_text:
-        am['email'] = span.getparent().find('a').get('href').replace('mailto:', '')
+        if 'Twitter' in span_text:
+            am['twitter'] = span.getparent().find('a').get('href')
+        elif 'Email' in span_text:
+            am['email'] = span.getparent().find('a').get('href').replace('mailto:', '')
 
     scraperwiki.sqlite.save(unique_keys=['name'], data=am)
 
